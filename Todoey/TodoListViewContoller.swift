@@ -12,7 +12,7 @@ class TodoListViewController: UITableViewController {
     
 // because using TableViewContorller & have tableviewController in storyboard, there is no need to setup a Delegate, IBOutlet, or Datasource.  Is automatically taken care of by Xcode behind the scene
  
-    let itemArray = ["Find Mike", "Byy Eggos", "Destroy Demogorgon"]
+    var itemArray = ["Find Mike", "Byy Eggos", "Destroy Demogorgon"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,8 +38,8 @@ class TodoListViewController: UITableViewController {
     
     //MARK: - TableView Delegate Methods
     
-//    message.TableView.delegate = self
-//    message.TableView.dataSource = self
+// Nope   message.TableView.delegate = self
+// Nope   message.TableView.dataSource = self
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -60,6 +60,36 @@ class TodoListViewController: UITableViewController {
         
     }
     
+    //MARK: - Add New Items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()
+        
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            // what will happen once the user clicks the Add Item button on our UIAlert
+//            print("Success")
+//            print(textField.text)
+            
+            print(self.itemArray)
+            self.itemArray.append(textField.text!)
+            print(self.itemArray)
+            self.tableView.reloadData()
+            
+        }
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+            
+            print("Now")
+        }
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+        
+    }
 }
 
 
