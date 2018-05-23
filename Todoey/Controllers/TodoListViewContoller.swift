@@ -32,9 +32,9 @@ class TodoListViewController: UITableViewController {
         newItem3.title = "Destroy Demogorgon"
         itemArray.append(newItem3)
         
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//            itemArray = items
+//        }
         
         
     }
@@ -48,6 +48,8 @@ class TodoListViewController: UITableViewController {
     
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
 
+        let item = itemArray[indexPath.row]
+        
         cell.textLabel?.text = item.title
 
         // Ternary operator
@@ -78,6 +80,7 @@ class TodoListViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+//      What will happen once the user clicks te Add Item button on our UIAlert
 
             let newItem = Item()
             newItem.title = textField.text!
@@ -91,8 +94,7 @@ class TodoListViewController: UITableViewController {
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
             textField = alertTextField
-            
-            print("Now")
+
         }
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
