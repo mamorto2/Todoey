@@ -104,6 +104,8 @@ class TodoListViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
+    //MARK: - Model Manipulation Methods (loads data from Plist)
+    
     func loadItems() {
         if let data = try? Data(contentsOf: dataFilePath!) {
            let decoder = PropertyListDecoder()
