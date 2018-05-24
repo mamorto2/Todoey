@@ -7,25 +7,20 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
-    
 // because using TableViewContorller & have tableviewController in storyboard, there is no need to setup a Delegate, IBOutlet, or Datasource.  Is automatically taken care of by Xcode behind the scene
  
     var itemArray = [Item]()
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
-    
-//    let defaults = UserDefaults.standard
-    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+  
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-        
 
-//        print(dataFilePath)
      
         loadItems()
-        
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
     }
 
@@ -53,8 +48,15 @@ class TodoListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
+ // another way to update Field values, but still have to go through context ->       itemArray[indexPath.row].setValue("Completed", forKey: "title")
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        // have to run context.  first or have errors due to change in tableview index and not in context index
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
+
+        
         saveItems()
 
         tableView.deselectRow(at: indexPath, animated: true)
@@ -72,9 +74,14 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
 //      What will happen once the user clicks te Add Item button on our UIAlert
 
-            let newItem = Item()
-            newItem.title = textField.text!
+       //     let context = AppDelegate()
+       // moved "let context =" code used to above to be shared
             
+            
+      //      let newItem = Item(context: context.persistentContainer.viewContext)
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             
             self.saveItems()
@@ -93,12 +100,11 @@ class TodoListViewController: UITableViewController {
     //MARK: - Model Manipulation Methods (saves data to Plist)
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
+
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context \(error)")
         }
         
         self.tableView.reloadData()
@@ -107,14 +113,13 @@ class TodoListViewController: UITableViewController {
     //MARK: - Model Manipulation Methods (loads data from Plist)
     
     func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!) {
-           let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Error decoding item array, \(error)")
-            }
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        do {
+            itemArray = try context.fetch(request)
+        } catch {
+            print("Error fetching data from context \(error)")
         }
+        
     }
     
     
