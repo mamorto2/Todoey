@@ -13,13 +13,20 @@ class TodoListViewController: UITableViewController {
 // because using TableViewContorller & have tableviewController in storyboard, there is no need to setup a Delegate, IBOutlet, or Datasource.  Is automatically taken care of by Xcode behind the scene
  
     var itemArray = [Item]()
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
-    let defaults = UserDefaults.standard
+//    let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-   
+        
+
+//        print(dataFilePath)
+        
+        
+        
+        
         let newItem = Item()
         newItem.title = "Find Mike"
         itemArray.append(newItem)
@@ -32,9 +39,9 @@ class TodoListViewController: UITableViewController {
         newItem3.title = "Destroy Demogorgon"
         itemArray.append(newItem3)
         
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        }
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
+//            itemArray = items
+//        }
         
         
     }
@@ -65,8 +72,8 @@ class TodoListViewController: UITableViewController {
 
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        
-        tableView.reloadData()
+        saveItems()
+
         tableView.deselectRow(at: indexPath, animated: true)
 
     }
@@ -86,9 +93,8 @@ class TodoListViewController: UITableViewController {
             newItem.title = textField.text!
             
             self.itemArray.append(newItem)
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
-            self.tableView.reloadData()
             
+            self.saveItems()
         }
         
         alert.addTextField { (alertTextField) in
@@ -100,6 +106,24 @@ class TodoListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
         
     }
+    
+    //MARK: - Model Manipulation Methods (saves data to Plist)
+    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+        self.tableView.reloadData()
+    }
+    
+    
+    
+    
 }
 
 
